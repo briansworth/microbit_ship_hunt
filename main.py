@@ -119,6 +119,7 @@ def show_guesses(guess_list: List[List[number]]):
 
 def _show_hit(guess):
     show_coordinate_led((guess[0], guess[1]))
+    led.plot_brightness(guess[0], guess[1], 200)
 
 def _show_guess(guess: List[number]):
     coordinate = (guess[0], guess[1])
@@ -145,8 +146,8 @@ def _get_guess_hits(guesses: List[List[number]]):
     return hits
 
 def display_game_board(cursor: tuple(int, int), guesses: List[List[number]]):
-    show_coordinate_led(cursor)
     show_guesses(guesses)
+    show_coordinate_led(cursor)
     pause(500)
     hide_coordinate_led(cursor)
     show_guesses(guesses)
