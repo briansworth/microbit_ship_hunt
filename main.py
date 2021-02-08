@@ -6,16 +6,6 @@ def generate_ship():
         ship = _generate_horizontal_ship()
     return ship
 
-def _generate_horizontal_ship():
-    LEFT_EDGE = 0
-    x = randint(0, 4)
-    y = randint(0, 4)
-    if x == LEFT_EDGE:
-        x_new = x + 1
-    else:
-        x_new = x - 1
-    return [[x, y], [x_new, y]]
-
 def _generate_vertical_ship():
     TOP_EDGE = 0
     y = randint(0, 4)
@@ -24,7 +14,17 @@ def _generate_vertical_ship():
         y_new = y + 1
     else:
         y_new = y - 1
-    return [[x, y], [x, y_new]]
+    return [(x, y), (x, y_new)]
+
+def _generate_horizontal_ship():
+    RIGHT_EDGE = 4
+    x = randint(0, 4)
+    y = randint(0, 4)
+    if x == RIGHT_EDGE:
+        x_new = x - 1
+    else:
+        x_new = x + 1
+    return [(x, y), (x_new, y)]
 
 def move_coordinates_right(coordinates: tuple(int, int)):
     x = coordinates[0]
@@ -78,12 +78,17 @@ def hit():
     basic.clear_screen()
 
 def show_guesses(guess_list: List[List[number]]):
-    HIT_INDEX = 2
     for guess in guess_list:
-        if guess[HIT_INDEX] == 1:
+        if is_guess_a_hit(guess) is True:
             _show_hit(guess)
         else:
             _show_guess(guess)
+
+def is_guess_a_hit(guess: List[number]):
+    HIT_INDEX = 2
+    if guess[HIT_INDEX] == 1:
+        return True
+    return False
 
 def _show_hit(guess):
     show_coordinate_led((guess[0], guess[1]))
@@ -94,17 +99,31 @@ def _show_guess(guess: List[number]):
     led.plot_brightness(guess[0], guess[1], 100)
 
 def is_gameover(guesses: List[List[number]], max_guesses: int, win_threshold: int):
-    HIT_INDEX = 2
-    hit_count = 0
-    for guess in guesses:
-        if guess[HIT_INDEX] == 1:
-            hit_count += 1
+    hit_count = _get_guess_hit_count(guesses)
     if hit_count >= win_threshold:
         return True
     elif guesses.length >= max_guesses:
         return True
     return False
 
+def _get_guess_hit_count(guesses: List[List[number]]):
+    hits = _get_guess_hits(guesses)
+    return hits.length
+
+def _get_guess_hits(guesses: List[List[number]]):
+    hits: List[List[number]] = []
+    for guess in guesses:
+        if is_guess_a_hit(guess) is True:
+            hits.append(guess)
+    return hits
+
+def display_game_board(cursor: tuple(int, int), guesses: List[List[number]]):
+    show_coordinate_led(cursor)
+    show_guesses(guesses)
+    pause(500)
+    hide_coordinate_led(cursor)
+    show_guesses(guesses)
+    pause(500)
 
 # Reduce number to increase difficulty
 # Increase number to reduce difficulty
@@ -133,12 +152,7 @@ def on_button_pressed_ab():
 input.on_button_pressed(Button.AB, on_button_pressed_ab)
 
 while not game.is_game_over():
-    show_coordinate_led(CURSOR)
-    pause(500)
-    hide_coordinate_led(CURSOR)
-    show_guesses(GUESSES)
-    pause(500)
-
+    display_game_board(CURSOR, GUESSES)
     game_over = is_gameover(GUESSES, GUESS_COUNT, WIN_THRESHOLD)
     if game_over:
         score = GUESS_COUNT - GUESSES.length
