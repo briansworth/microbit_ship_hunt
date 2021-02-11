@@ -4,13 +4,6 @@ def generate_ships(count: int):
         ship_list.append(add_ship(ship_list))
     return ship_list
 
-def add_ship(ships: List[List[tuple(int, int)]]):
-    while True:
-        new_ship = generate_ship()
-        if is_ship_overlapping(new_ship, ships) is False:
-            break
-    return new_ship
-
 def generate_ship():
     vertical = randint(0, 1)
     if vertical == 1:
@@ -19,18 +12,12 @@ def generate_ship():
         ship = _generate_horizontal_ship()
     return ship
 
-def is_ship_overlapping(ship: List[tuple(int, int)], ships: List[List[tuple(int, int)]]):
-    for coord in ship:
-        for other_ship in ships:
-            if is_coordinate_in_ship(coord, other_ship) is True:
-                return True
-    return False
-
-def is_coordinate_in_ship(coordinate: tuple(int, int), ship: List[tuple(int, int)]):
-    for ship_coord in ship:
-        if coordinate[0] == ship_coord[0] and coordinate[1] == ship_coord[1]:
-            return True
-    return False
+def add_ship(ships: List[List[tuple(int, int)]]):
+    while True:
+        new_ship = generate_ship()
+        if is_ship_overlapping(new_ship, ships) is False:
+            break
+    return new_ship
 
 def _generate_vertical_ship():
     TOP_EDGE = 0
@@ -52,6 +39,37 @@ def _generate_horizontal_ship():
         x_new = x + 1
     return [(x, y), (x_new, y)]
 
+def is_ship_overlapping(ship: List[tuple(int, int)], ships: List[List[tuple(int, int)]]):
+    for coord in ship:
+        for other_ship in ships:
+            if is_coordinate_in_ship(coord, other_ship) is True:
+                return True
+    return False
+
+def is_coordinate_in_ship(coordinate: tuple(int, int), ship: List[tuple(int, int)]):
+    for ship_coord in ship:
+        if coordinate[0] == ship_coord[0] and coordinate[1] == ship_coord[1]:
+            return True
+    return False
+
+def show_ship(ship: List[tuple(int, int)]):
+    for coordinate in ship:
+        show_coordinate_led(coordinate)
+
+def hide_ship(ship: List[List[number]]):
+    for coordinate in ship:
+        hide_coordinate_led(coordinate)
+
+def update_coordinate_led(cursor: tuple(int, int), coordinates: tuple(int, int)):
+    hide_coordinate_led(cursor)
+    show_coordinate_led(coordinates)
+
+def hide_coordinate_led(coordinate: List[number]):
+    led.unplot(coordinate[0], coordinate[1])
+
+def show_coordinate_led(coordinate: List[number]):
+    led.plot(coordinate[0], coordinate[1])
+
 def move_coordinates_right(coordinates: tuple(int, int)):
     x = coordinates[0]
     y = coordinates[1]
@@ -67,24 +85,6 @@ def move_coordinates_down(coordinates: tuple(int, int)):
     if y >= 4:
         new_y = 0
     return (x, new_y)
-
-def update_coordinate_led(cursor: tuple(int, int), coordinates: tuple(int, int)):
-    hide_coordinate_led(cursor)
-    show_coordinate_led(coordinates)
-
-def show_ship(ship: List[tuple(int, int)]):
-    for coordinate in ship:
-        show_coordinate_led(coordinate)
-
-def hide_ship(ship: List[List[number]]):
-    for coordinate2 in ship:
-        hide_coordinate_led(coordinate2)
-
-def hide_coordinate_led(coordinate: List[number]):
-    led.unplot(coordinate[0], coordinate[1])
-
-def show_coordinate_led(coordinate: List[number]):
-    led.plot(coordinate[0], coordinate[1])
 
 def make_guess(cursor: tuple(int, int), ships: List[List[tuple(int, int)]]):
     for ship in ships:
@@ -187,4 +187,3 @@ while not game.is_game_over():
         score = GUESS_COUNT - GUESSES.length
         game.set_score(score)
         game.game_over()
-
